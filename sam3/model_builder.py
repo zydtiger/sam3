@@ -48,16 +48,15 @@ from sam3.sam.transformer import RoPEAttention
 # Setup TensorFloat-32 for Ampere GPUs if available
 def _setup_tf32() -> None:
     """Enable TensorFloat-32 for Ampere GPUs if available.
-    Uses new PyTorch 2.9+ API to avoid deprecation warnings.
+    Keep matmul precision API consistent to avoid Inductor mixed-API errors.
     """
     if torch.cuda.is_available():
         device_props = torch.cuda.get_device_properties(0)
         if device_props.major >= 8:
-            # New API (PyTorch 2.9+): fp32_precision instead of allow_tf32
-            # Options: "tf32" (fastest, lower precision), "highest" (highest precision, slower)
-            torch.backends.cuda.matmul.fp32_precision = "tf32"
-            # For cuDNN convolutions, the new API is:
-            torch.backends.cudnn.conv.fp32_precision = "tf32"
+            # Use generic matmul precision API (compatible with Inductor checks).
+            torch.set_float32_matmul_precision("high")
+            # Keep TF32 enabled for cuDNN convolutions as well.
+            torch.backends.cudnn.allow_tf32 = True
 
 
 _setup_tf32()
