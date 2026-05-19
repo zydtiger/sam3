@@ -34,6 +34,8 @@ dependencies = [
     "einops",
     "decord",
     "pycocotools",
+    "triton; sys_platform == 'linux'",
+    "triton-windows; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
@@ -126,6 +128,7 @@ module = [
     "ftfy.*",
     "regex.*",
     "iopath.*",
+    "triton.*",
 ]
 ignore_missing_imports = true
 
