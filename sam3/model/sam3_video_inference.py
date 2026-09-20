@@ -57,7 +57,7 @@ class Sam3VideoInference(Sam3VideoBase):
         resource_path,
         offload_video_to_cpu=False,
         async_loading_frames=False,
-        video_loader_type="cv2",
+        video_loader_type="pyav",
     ):
         """Initialize an inference state from `resource_path` (an image or a video)."""
         images, orig_height, orig_width = load_resource_as_video_frames(

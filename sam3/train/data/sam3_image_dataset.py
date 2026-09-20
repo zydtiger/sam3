@@ -16,12 +16,11 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import torch
 import torch.utils.data
-import torchvision
-from decord import cpu, VideoReader
 from iopath.common.file_io import g_pathmgr
 from PIL import Image as PILImage
 from PIL.Image import DecompressionBombError
 from sam3.model.box_ops import box_xywh_to_xyxy
+from sam3.model.video_io import read_video_frame
 from torchvision.datasets.vision import VisionDataset
 
 from .coco_json_loaders import COCO_FROM_JSON
@@ -200,19 +199,9 @@ class CustomCocoDetectionAPI(VisionDataset):
             all_img_metadata.append(current_meta)
             path = os.path.join(self.root, path)
             try:
-                if ".mp4" in path and path[-4:] == ".mp4":
-                    # Going to load a video frame
-                    video_path, frame = path.split("@")
-                    video = VideoReader(video_path, ctx=cpu(0))
-                    # Convert to PIL image
-                    all_images.append(
-                        (
-                            img_id,
-                            torchvision.transforms.ToPILImage()(
-                                video[int(frame)].asnumpy()
-                            ),
-                        )
-                    )
+                if "@" in path and path.rsplit("@", 1)[0].lower().endswith(".mp4"):
+                    video_path, frame = path.rsplit("@", 1)
+                    all_images.append((img_id, read_video_frame(video_path, int(frame))))
                 else:
                     with g_pathmgr.open(path, "rb") as fopen:
                         all_images.append((img_id, PILImage.open(fopen).convert("RGB")))

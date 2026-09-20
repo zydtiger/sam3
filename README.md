@@ -86,15 +86,37 @@ cd sam3
 pip install -e .
 ```
 
-4. **Install additional dependencies for example notebooks or development:**
+4. **Install the optional dependencies needed for your workflow:**
 
 ```bash
-# For running example notebooks
-pip install -e ".[notebooks]"
+# For video inference and frame extraction
+pip install -e ".[video]"
 
-# For development
-pip install -e ".[train,dev]"
+# For running all example notebooks, including video examples
+pip install -e ".[notebooks,video]"
+
+# For image training
+pip install -e ".[train]"
+
+# For video training
+pip install -e ".[train,video]"
+
+# For development, including the video compatibility checks
+pip install -e ".[train,dev,video]"
 ```
+
+The base installation supports image and tensor inference without PyAV or
+psutil. The `video` extra adds PyAV for decoding and psutil for the video
+predictor. Video files use PyAV by default; frames are decoded in presentation
+order, converted to RGB, resized, and normalized from the `[0, 1]` range. PyAV
+binary wheels include the FFmpeg libraries needed for decoding.
+
+OpenCV and TorchCodec remain explicit alternatives via `video_loader_type="cv2"`
+and `video_loader_type="torchcodec"`. Install their dependencies separately;
+TorchCodec also requires a compatible PyTorch version and FFmpeg shared libraries.
+OpenCV remains in the notebook and development extras because image and mask
+utilities also use it. Video download scripts still use the development extra's
+`yt-dlp`; they are not required for local video inference.
 
 ### NumPy compatibility checks
 
@@ -102,7 +124,7 @@ This fork requires NumPy 2 or higher. Use PyTorch and torchvision wheels
 compatible with your Python version; the compatibility tests cover Python
 3.12, 3.13, and 3.14 with PyTorch 2.12.1 and torchvision 0.27.1.
 
-After installing the development dependencies, run the offline image, video,
+After installing `.[train,dev,video]`, run the offline image, video,
 mask, and tensor interoperability checks with:
 
 ```sh
@@ -110,9 +132,9 @@ python -m pytest tests/test_numpy_compatibility.py sam3/perflib/tests/tests.py
 ```
 
 These checks require no GPU, model checkpoint, network access, or downloaded
-dataset. They exercise both NumPy/Torch and NumPy/Decord conversions, image
-preprocessing, OpenCV video decoding, COCO mask encoding, and boolean masks used
-by the visualizer.
+dataset. They exercise NumPy/Torch and PyAV conversions, image preprocessing,
+PyAV and OpenCV video decoding, exact frame selection, optional video dependencies,
+COCO mask encoding, and boolean masks used by the visualizer.
 
 ## Getting Started
 
@@ -193,8 +215,8 @@ dataset.
 To run the Jupyter notebook examples:
 
 ```bash
-# Make sure you have the notebooks dependencies installed
-pip install -e ".[notebooks]"
+# Include the video extra when running video notebooks
+pip install -e ".[notebooks,video]"
 
 # Start Jupyter notebook
 jupyter notebook examples/sam3_image_predictor_example.ipynb
@@ -366,7 +388,7 @@ We release 2 image benchmarks, [SA-Co/Gold](scripts/eval/gold/README.md) and
 To set up the development environment:
 
 ```bash
-pip install -e ".[dev,train]"
+pip install -e ".[dev,train,video]"
 ```
 
 To format the code:

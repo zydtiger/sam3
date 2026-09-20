@@ -10,6 +10,10 @@ cd sam3
 pip install -e ".[train]"
 ```
 
+For datasets that read frames from video files, install `pip install -e ".[train,video]"`.
+Video frame references use `path/to/video.mp4@<zero-based-frame-index>`.
+
+
 ### Training Script Usage
 
 The main training script is located at `sam3/train.py`. It uses Hydra configuration management to handle complex training setups.

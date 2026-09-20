@@ -30,14 +30,16 @@ dependencies = [
     "typing_extensions",
     "huggingface_hub",
     "einops",
-    "decord",
     "pycocotools",
-    "psutil",
     "triton; sys_platform == 'linux'",
     "triton-windows; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]
+video = [
+    "av>=18",
+    "psutil",
+]
 dev = [
     "pytest",
     "pytest-cov",
@@ -62,7 +64,6 @@ notebooks = [
     "ipycanvas",
     "ipympl",
     "pycocotools",
-    "decord",
     "opencv-python",
     "einops",
     "scikit-image",

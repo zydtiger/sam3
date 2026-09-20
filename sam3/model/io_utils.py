@@ -15,6 +15,7 @@ import torch.nn.functional as F
 import torchvision.transforms.functional as TF
 from PIL import Image
 from sam3.logger import get_logger
+from sam3.model.video_io import load_video_frames_using_pyav
 from tqdm import tqdm
 
 logger = get_logger(__name__)
@@ -33,7 +34,7 @@ def load_resource_as_video_frames(
     img_mean=(0.5, 0.5, 0.5),
     img_std=(0.5, 0.5, 0.5),
     async_loading_frames=False,
-    video_loader_type="cv2",
+    video_loader_type="pyav",
 ):
     """
     Load video frames from either a video or an image (as a single-frame video).
@@ -120,7 +121,7 @@ def load_video_frames(
     img_mean=(0.5, 0.5, 0.5),
     img_std=(0.5, 0.5, 0.5),
     async_loading_frames=False,
-    video_loader_type="cv2",
+    video_loader_type="pyav",
 ):
     """
     Load the video frames from video_path. The frames are resized to image_size as in
@@ -219,10 +220,18 @@ def load_video_frames_from_video_file(
     async_loading_frames,
     gpu_acceleration=False,
     gpu_device=None,
-    video_loader_type="cv2",
+    video_loader_type="pyav",
 ):
     """Load the video frames from a video file."""
-    if video_loader_type == "cv2":
+    if video_loader_type == "pyav":
+        return load_video_frames_using_pyav(
+            video_path=video_path,
+            image_size=image_size,
+            img_mean=img_mean,
+            img_std=img_std,
+            offload_video_to_cpu=offload_video_to_cpu,
+        )
+    elif video_loader_type == "cv2":
         return load_video_frames_from_video_file_using_cv2(
             video_path=video_path,
             image_size=image_size,
@@ -249,7 +258,7 @@ def load_video_frames_from_video_file(
                 async_thread.join()
         return lazy_images, lazy_images.video_height, lazy_images.video_width
     else:
-        raise RuntimeError("video_loader_type must be either 'cv2' or 'torchcodec'")
+        raise RuntimeError("video_loader_type must be 'pyav', 'cv2', or 'torchcodec'")
 
 
 def load_video_frames_from_video_file_using_cv2(

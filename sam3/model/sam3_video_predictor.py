@@ -14,7 +14,16 @@ import uuid
 from contextlib import closing
 from typing import List, Optional
 
-import psutil
+try:
+    import psutil
+except ModuleNotFoundError as exc:
+    if exc.name != "psutil":
+        raise
+    raise ImportError(
+        'Video prediction requires psutil. Install SAM3 with the video extra: '
+        'pip install ".[video]" from the SAM3 checkout.'
+    ) from exc
+
 import torch
 from sam3.logger import get_logger
 
@@ -33,7 +42,7 @@ class Sam3VideoPredictor:
         geo_encoder_use_img_cross_attn=True,
         strict_state_dict_loading=True,
         async_loading_frames=False,
-        video_loader_type="cv2",
+        video_loader_type="pyav",
         apply_temporal_disambiguation: bool = True,
     ):
         self.async_loading_frames = async_loading_frames

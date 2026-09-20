@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import torch
 import torchvision
-# from decord import cpu, VideoReader
 
 from iopath.common.file_io import PathManager
 from PIL import Image as PILImage

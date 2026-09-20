@@ -12,6 +12,7 @@ from threading import Thread
 import numpy as np
 import torch
 from PIL import Image
+from sam3.model.video_io import load_video_frames_using_pyav
 from tqdm import tqdm
 
 
@@ -211,25 +212,12 @@ def load_video_frames_from_video_file(
     img_std=(0.5, 0.5, 0.5),
     compute_device=torch.device("cuda"),
 ):
-    """Load the video frames from a video file."""
-    import decord
-
-    img_mean = torch.tensor(img_mean, dtype=torch.float32)[:, None, None]
-    img_std = torch.tensor(img_std, dtype=torch.float32)[:, None, None]
-    # Get the original video height and width
-    decord.bridge.set_bridge("torch")
-    video_height, video_width, _ = decord.VideoReader(video_path).next().shape
-    # Iterate over all frames in the video
-    images = []
-    for frame in decord.VideoReader(video_path, width=image_size, height=image_size):
-        images.append(frame.permute(2, 0, 1))
-
-    images = torch.stack(images, dim=0).float() / 255.0
-    if not offload_video_to_cpu:
-        images = images.to(compute_device)
-        img_mean = img_mean.to(compute_device)
-        img_std = img_std.to(compute_device)
-    # normalize by mean and std
-    images -= img_mean
-    images /= img_std
-    return images, video_height, video_width
+    """Decode tracker video inputs using the optional shared PyAV loader."""
+    return load_video_frames_using_pyav(
+        video_path=video_path,
+        image_size=image_size,
+        offload_video_to_cpu=offload_video_to_cpu,
+        img_mean=img_mean,
+        img_std=img_std,
+        compute_device=compute_device,
+    )
