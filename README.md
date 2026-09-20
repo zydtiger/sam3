@@ -60,6 +60,7 @@ This breakthrough is driven by an innovative data engine that has automatically 
 ### Prerequisites
 
 - Python 3.12 or higher
+- NumPy 2 or higher
 - PyTorch 2.7 or higher
 - CUDA-compatible GPU with CUDA 12.6 or higher
 
@@ -94,6 +95,24 @@ pip install -e ".[notebooks]"
 # For development
 pip install -e ".[train,dev]"
 ```
+
+### NumPy compatibility checks
+
+This fork requires NumPy 2 or higher. Use PyTorch and torchvision wheels
+compatible with your Python version; the compatibility tests cover Python
+3.12, 3.13, and 3.14 with PyTorch 2.12.1 and torchvision 0.27.1.
+
+After installing the development dependencies, run the offline image, video,
+mask, and tensor interoperability checks with:
+
+```sh
+python -m pytest tests/test_numpy_compatibility.py sam3/perflib/tests/tests.py
+```
+
+These checks require no GPU, model checkpoint, network access, or downloaded
+dataset. They exercise both NumPy/Torch and NumPy/Decord conversions, image
+preprocessing, OpenCV video decoding, COCO mask encoding, and boolean masks used
+by the visualizer.
 
 ## Getting Started
 
