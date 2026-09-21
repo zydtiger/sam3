@@ -15,6 +15,7 @@ import torch
 from PIL import Image
 
 from sam3.agent.helpers.visualizer import GenericMask, _PanopticPrediction
+from sam3.agent.viz import visualize
 from sam3.model.io_utils import (
     load_resource_as_video_frames,
     load_video_frames_from_video_file,
@@ -45,7 +46,7 @@ def test_image_frame_normalization():
     torch.testing.assert_close(frames[0, :, 0, 0], expected)
 
 
-def test_mask_encoding_and_visualization():
+def test_mask_encoding_and_visualization(tmp_path):
     """Exercise the compiled COCO mask extension and SAM3's visualization adapter."""
     mask = np.zeros((12, 16), dtype=np.uint8)
     mask[2:8, 3:10] = 1
@@ -54,6 +55,19 @@ def test_mask_encoding_and_visualization():
     decoded = GenericMask(encoded, *mask.shape)
     np.testing.assert_array_equal(decoded.mask, mask)
     assert decoded.area() == 42
+    image_path = tmp_path / "image.png"
+    Image.new("RGB", (16, 12), "white").save(image_path)
+    rendered = visualize(
+        {
+            "orig_img_h": 12,
+            "orig_img_w": 16,
+            "original_image_path": str(image_path),
+            "pred_boxes": [[3, 2, 10, 8]],
+            "pred_masks": [encoded["counts"]],
+        }
+    )
+    assert rendered.size == (16, 12)
+    assert np.any(np.asarray(rendered) != 255)
 
 
 def test_panoptic_boolean_masks():

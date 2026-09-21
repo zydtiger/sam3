@@ -1,5 +1,9 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates. All Rights Reserved
 
+"""Render agent mask results with the shared visualizer and zoom-in helpers."""
+
+from __future__ import annotations
+
 # pyre-unsafe
 
 import cv2
