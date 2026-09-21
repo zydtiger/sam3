@@ -59,9 +59,9 @@ This breakthrough is driven by an innovative data engine that has automatically 
 
 ### Prerequisites
 
-- Python 3.12 or higher
-- NumPy 2 or higher
-- PyTorch 2.7 or higher
+- Python 3.9 or higher
+- NumPy 1.26 or higher
+- PyTorch 2.8 or higher
 - CUDA-compatible GPU with CUDA 12.6 or higher
 
 1. **Create a new Conda environment:**
@@ -75,7 +75,7 @@ conda activate sam3
 2. **Install PyTorch with CUDA support:**
 
 ```bash
-pip install torch==2.7.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0 --index-url https://download.pytorch.org/whl/cu126
 ```
 
 3. **Clone the repository and install the package:**
@@ -120,9 +120,11 @@ utilities also use it. Video download scripts still use the development extra's
 
 ### NumPy compatibility checks
 
-This fork requires NumPy 2 or higher. Use PyTorch and torchvision wheels
-compatible with your Python version; the compatibility tests cover Python
-3.12, 3.13, and 3.14 with PyTorch 2.12.1 and torchvision 0.27.1.
+This fork accepts NumPy 1.26 and NumPy 2. Use PyTorch and torchvision wheels
+compatible with your Python version. The minimum compatibility environment is
+Python 3.9, PyTorch 2.8.0, torchvision 0.23.0, NumPy 1.26.4, and PyAV 15.1.0.
+The newer Python 3.12–3.14 environments remain supported. The `video` extra
+resolves a PyAV release compatible with the selected Python version.
 
 After installing `.[train,dev,video]`, run the offline image, video,
 mask, and tensor interoperability checks with:
